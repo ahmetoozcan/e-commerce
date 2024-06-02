@@ -4,50 +4,37 @@ import { BrowserRouter } from 'react-router-dom';
 import Rout from './comp/rout';
 import Footer from './comp/footer';
 import './App.css';
+import { toast, ToastContainer } from 'react-toastify';
+import { UserProvider } from './provider/UserProvider';
 
 const App = () => {
     const [cart, setCart] = useState([]);
-    const [notification, setNotification] = useState(null);
 
 
     const addtocart = (product) => {
         const exist = cart.find((x) => x.id === product.id);
         if (exist) {
-            setNotification({
-                message: `Product is already in your cart.`,
-                type: 'error'
+            toast.error('Product already in cart', {
+                containerId: 'default'
             });
-            setTimeout(() => {
-                setNotification(null);
-            }, 4000);
         } else {
             setCart([...cart, { ...product, qty: 1 }]);
-            setNotification({
-                message: `Product successfully added to your cart.`,
-                type: 'success'
+            toast.success('Product added to cart', {
+                containerId: 'default'
             });
-            setTimeout(() => {
-                setNotification(null);
-            }, 4000);
         }
     }
 
-    console.log(cart);
 
     return (
-        <>
+        <UserProvider>
             <BrowserRouter>
                 <Nav cart={cart} />
                 <Rout setCart={setCart} cart={cart} addtocart={addtocart} />
                 <Footer />
             </BrowserRouter>
-            {notification && (
-                <div className={`notification ${notification.type}`}>
-                    <span className="notification-message">{notification.message}</span>
-                    <button className="notification-close" onClick={() => setNotification(null)}>x</button>
-                </div>
-            )}
-        </>
+            <ToastContainer containerId={"default"} />
+        </UserProvider>
     );
 }
 

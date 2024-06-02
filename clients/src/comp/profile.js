@@ -1,49 +1,105 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './profile.css';
+import { UserContext } from '../provider/UserProvider';
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-    const [orders, setOrders] = useState([
-        {
-            id: '12345',
-            date: '2023-05-29',
-            status: 'Shipped',
-            total: '$150.00',
-            items: [
-                { name: 'Item 1', quantity: 1, price: '$50.00' },
-                { name: 'Item 2', quantity: 2, price: '$100.00' }
-            ]
-        },
-        {
-            id: '67890',
-            date: '2023-05-28',
-            status: 'Processing',
-            total: '$250.00',
-            items: [
-                { name: 'Item 3', quantity: 1, price: '$100.00' },
-                { name: 'Item 4', quantity: 3, price: '$150.00' }
-            ]
-        },
-        {
-            id: '11223',
-            date: '2023-05-27',
-            status: 'Delivered',
-            total: '$300.00',
-            items: [
-                { name: 'Item 5', quantity: 2, price: '$200.00' },
-                { name: 'Item 6', quantity: 1, price: '$100.00' }
-            ]
-        }
-    ]);
+    const navigate = useNavigate();
 
+    const { user, setUser } = useContext(UserContext);
+    const [orders, setOrders] = useState([]);
+
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_API_BASE_URI}api/private/order/all`, {}, {
+            withCredentials: true
+        })
+            .then(response => {
+                setOrders(response.data);
+            })
+            .catch(error => {
+                console.error('Failed to fetch orders', error);
+            });
+    }, []);
 
     const handleCancelOrder = (orderId) => {
-        // Implement cancel order functionality
-        console.log('Cancel order:', orderId);
+        if (!window.confirm('Are you sure you want to cancel this order?')) {
+            return;
+        }
+        axios.put(`${process.env.REACT_APP_API_BASE_URI}api/private/order/cancel?orderId=${orderId}&userId=${user.id}`, {}, {
+            withCredentials: true
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    setOrders(orders.map(order => {
+                        if (order.id === orderId) {
+                            return { ...order, status: 'CANCELLED' };
+                        }
+                        return order;
+                    }));
+                    toast.success('Order cancelled successfully',
+                        {
+                            containerId: 'profile-toast'
+                        });
+                } else {
+                    toast.error('Failed to cancel order',
+                        {
+                            containerId: 'profile-toast'
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Failed to cancel order', error);
+            });
+    };
+
+    const handleRemoveAccount = (userId) => {
+        if (!window.confirm('Are you sure you want to delete your account?')) {
+            return;
+        }
+        axios.delete(`${process.env.REACT_APP_API_BASE_URI}api/private/user/delete?userId=${userId}`, {}, {
+            withCredentials: true
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    toast.success('User account delete successfully',
+                        {
+                            containerId: 'profile-toast'
+                        });
+                    axios.get(`${process.env.REACT_APP_API_BASE_URI}logout`, {
+                        withCredentials: true
+                    }).then((response) => {
+                        if (response.status === 200) {
+                            setUser(null);
+                            setTimeout(() => {
+                                navigate('/');
+                            }, 2000);
+                        }
+                    }).catch((error) => {
+                        toast.error('Failed to delete user account',
+                            {
+                                containerId: 'profile-toast'
+                            });
+                    });
+                } else {
+                    toast.error('Failed to delete user account',
+                        {
+                            containerId: 'profile-toast'
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Failed to delete user account', error);
+            });
     };
 
     return (
         <div className="orders-container">
-            <h1>Your Orders</h1>
+            <h1 className='profile-heading'>Profile</h1>
+            <button className='remove-account-button' onClick={() => handleRemoveAccount(user.id)}>Delete Account</button>
+            <h1 className='your-orders-heading'>Your Orders</h1>
             {orders.map(order => (
                 <div key={order.id} className="order-card">
                     <div className="order-summary">
@@ -55,17 +111,26 @@ const Profile = () => {
                         <details>
                             <summary>Order Details</summary>
                             <ul>
-                                {order.items.map((item, index) => (
-                                    <li key={index}>
-                                        {item.name} - {item.quantity} x {item.price}
+                                {order.products.map((product, index) => (
+                                    <li key={index} className="product-item">
+                                        <img src={product.image_path} alt={product.name} className="product-image" />
+                                        <span className="product-name">{product.name}</span>
+                                        <span className="product-quantity">Quantity: {product.quantity}</span>
+                                        <span className="product-price">Price: {product.price}</span>
                                     </li>
                                 ))}
                             </ul>
-                            <button onClick={() => handleCancelOrder(order.id)}>Cancel Order</button>
                         </details>
                     </div>
+
+                    {
+                        order.status !== "CANCELLED"
+                            ? <button className='cancel-order-button' onClick={() => handleCancelOrder(order.id)}>Cancel Order</button>
+                            : null
+                    }
                 </div>
             ))}
+            <ToastContainer containerId={"profile-toast"} />
         </div>
     );
 };

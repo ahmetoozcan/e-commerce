@@ -58,15 +58,14 @@ const Cart = ({ cart, setCart }) => {
                     {
                         cart.map((curElm) => {
                             return (
-                                <>
+                                <div key={curElm}>
                                     <div className='box'>
                                         <div className='img_box'>
-                                            <img src={curElm.image} alt=''></img>
+                                            <img src={curElm.image_path} alt=''></img>
                                         </div>
                                         <div className='detail'>
                                             <div className='info'>
-                                                <h4>{curElm.cat}</h4>
-                                                <h3>{curElm.Name}</h3>
+                                                <h3>{curElm.name}</h3>
                                                 <p>Price: ${curElm.price}</p>
                                                 <p>Total: ${curElm.price * curElm.qty}</p>
                                             </div>
@@ -80,7 +79,7 @@ const Cart = ({ cart, setCart }) => {
                                             </div>
                                         </div>
                                     </div>
-                                </>
+                                </div>
                             )
                         })
                     }

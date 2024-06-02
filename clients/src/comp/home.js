@@ -1,7 +1,22 @@
+import { useState } from 'react'
 import './home.css'
-import Homeproduct from './home_product'
+import axios from 'axios'
+
 const Home = ({ addtocart }) => {
 
+    const [product, setProduct] = useState([])
+
+    useState(() => {
+
+        axios.get(`${process.env.REACT_APP_API_BASE_URI}api/public/product/all`, {}, {
+            withCredentials: true
+        }).then((response) => {
+            setProduct(response.data);
+        }).catch((error) => {
+            console.error(error);
+        });
+
+    }, [])
 
     return (
         <>
@@ -12,20 +27,18 @@ const Home = ({ addtocart }) => {
                             <div className='products'>
                                 <div className='container'>
                                     {
-                                        Homeproduct.map((curElm) => {
+                                        product.map((curElm) => {
                                             return (
-                                                <>
-                                                    <div className='box'>
-                                                        <div className='img_box'>
-                                                            <img src={curElm.image} alt=''></img>
-                                                        </div>
-                                                        <div className='info'>
-                                                            <h3>{curElm.Name}</h3>
-                                                            <p>${curElm.price}</p>
-                                                            <button className='btn' onClick={() => addtocart(curElm)}>Add to cart</button>
-                                                        </div>
+                                                <div className='box' key={curElm.id}>
+                                                    <div className='img_box'>
+                                                        <img src={curElm.image_path} alt=''></img>
                                                     </div>
-                                                </>
+                                                    <div className='info'>
+                                                        <h3>{curElm.name}</h3>
+                                                        <p>${curElm.price}</p>
+                                                        <button className='btn' onClick={() => addtocart(curElm)}>Add to cart</button>
+                                                    </div>
+                                                </div>
                                             )
                                         })
                                     }

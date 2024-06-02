@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import './payment.css';
+import { UserContext } from '../provider/UserProvider';
+import { toast, ToastContainer } from 'react-toastify';
+import axios from 'axios';
 
 const Payment = ({ cart, setCart }) => {
+    const { user } = useContext(UserContext);
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -30,6 +35,18 @@ const Payment = ({ cart, setCart }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        toast.success(user, {
+            containerId: 'payment-toast'
+        });
+        if (!user) {
+            toast.error('You need to login to make a purchase.', {
+                containerId: 'payment-toast'
+            });
+
+            return;
+        }
+
+
         if (
             formData.firstName &&
             formData.lastName &&
@@ -42,17 +59,46 @@ const Payment = ({ cart, setCart }) => {
             formData.expiryDate &&
             formData.cvv
         ) {
-            setPaymentMessage('Payment successfully completed!');
-            setIsPurchaseComplete(true);
+            let products = {};
+            cart.forEach((item) => {
+                products[item.id] = item.qty;
+            });
+            const orderData = {
+                phone: formData.phone,
+                address: formData.address,
+                district: formData.district,
+                city: formData.city,
+                products: products,
+
+            };
+
+            axios.post(`${process.env.REACT_APP_API_BASE_URI}api/private/order/create?userId=${user.id}`, orderData, {
+                withCredentials: true
+            })
+                .then(response => {
+                    if (response.status !== 200) {
+                        throw new Error('An error occurred during payment. Please check your information.');
+                    }
+                    const contentType = response.headers['content-type'];
+                    if (contentType && contentType.indexOf('application/json') !== -1) {
+                        return response.data;
+                    } else {
+                        return response.data;
+                    }
+                })
+                .then(data => {
+                    setPaymentMessage('Payment successfully completed!');
+                    setIsPurchaseComplete(true);
+                })
+                .catch(error => {
+                    setPaymentMessage('An error occurred during payment. Please check your information.');
+                });
         } else {
-            setPaymentMessage('An error occurred during payment. Please check your information.');
+            toast.error('Please fill in all the fields.', {
+                containerId: 'payment-toast'
+            });
         }
     };
-
-    const cancelPurchase = () => {
-        setPaymentMessage('Order canceled.');
-    };
-
 
     return (
         <div className="payment">
@@ -114,10 +160,9 @@ const Payment = ({ cart, setCart }) => {
             ) : (
                 <div>
                     <p>{paymentMessage}</p>
-                    <button className="cancel-button" onClick={cancelPurchase}>Cancel Purchase</button>
-
                 </div>
             )}
+            <ToastContainer containerId={"payment-toast"} />
         </div>
     );
 };
