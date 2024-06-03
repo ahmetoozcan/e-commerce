@@ -31,10 +31,12 @@ const Nav = ({ cart }) => {
                     });
 
                 setUser(null);
-                navigate('/');
+                setTimeout(() => {
+                    navigate('/');
+                }, 1500);
             }
         }).catch((error) => {
-            console.log(error);
+            console.error(error);
         });
     }
 

@@ -1,5 +1,6 @@
 package com.aja.e_commerce.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class ProductController {
     private ProductService productService;
 
     @GetMapping("/all")
-    public List<Product> getAllProducts() {
-        return productService.getAll();
+    public ResponseEntity<List<Product>> getAllProducts() {
+        return ResponseEntity.ok(productService.getAll());
     }
 }

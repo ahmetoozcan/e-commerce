@@ -55,9 +55,9 @@ function Register() {
                 toast.success('Registration successful! Redirecting to login page...', { containerId: 'register' });
                 setTimeout(() => {
                     navigate('/login');
-                }, 2000);
+                }, 1500);
             } else {
-                toast.error('Registration failed!', { containerId: 'register' });
+                toast.error(`Registration failed! ${response.data}`, { containerId: 'register' });
             }
         }).catch((error) => {
             toast.error('Something went wrong!', { containerId: 'register' });

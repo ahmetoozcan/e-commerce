@@ -3,8 +3,9 @@ import './home.css'
 import axios from 'axios'
 
 const Home = ({ addtocart }) => {
-
     const [product, setProduct] = useState([])
+
+
 
     useState(() => {
 

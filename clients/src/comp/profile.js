@@ -64,7 +64,7 @@ const Profile = () => {
         })
             .then(response => {
                 if (response.status === 200) {
-                    toast.success('User account delete successfully',
+                    toast.success('User account deleted successfully! Redirecting to main page... ',
                         {
                             containerId: 'profile-toast'
                         });
@@ -75,7 +75,7 @@ const Profile = () => {
                             setUser(null);
                             setTimeout(() => {
                                 navigate('/');
-                            }, 2000);
+                            }, 1500);
                         }
                     }).catch((error) => {
                         toast.error('Failed to delete user account',
@@ -105,7 +105,7 @@ const Profile = () => {
                     <div className="order-summary">
                         <div className="order-date"><strong>Date:</strong> {order.date}</div>
                         <div className="order-status"><strong>Status:</strong> {order.status}</div>
-                        <div className="order-total"><strong>Total:</strong> {order.total}</div>
+                        <div className="order-total"><strong>Total:</strong> ${order.total}</div>
                     </div>
                     <div className="order-details">
                         <details>
@@ -116,7 +116,7 @@ const Profile = () => {
                                         <img src={product.image_path} alt={product.name} className="product-image" />
                                         <span className="product-name">{product.name}</span>
                                         <span className="product-quantity">Quantity: {product.quantity}</span>
-                                        <span className="product-price">Price: {product.price}</span>
+                                        <span className="product-price">Price: ${product.price}</span>
                                     </li>
                                 ))}
                             </ul>

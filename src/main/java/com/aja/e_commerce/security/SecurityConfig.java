@@ -39,14 +39,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((request) -> request
                         // Allowing public access to static resources and specific files 
-                        .requestMatchers("/","/static/**", "/index.html", "/manifest.json", "/asset-manifest.json",
+                        .requestMatchers("/static/**", "/index.html", "/manifest.json", "/asset-manifest.json",
                                 "/ogu.ico", "/ogu192.png", "/ogu512.png", "/robots.txt", "/image/**").permitAll()
                         // Allowing access to the client forward controller
-                        .requestMatchers("/cart", "/contact", "/payment", "/profile/*").permitAll()
+                        .requestMatchers("/","/cart", "/contact", "/payment", "/profile/*").permitAll()
                         // Allowing access to the access-denied page
                         .requestMatchers("/access-denied").permitAll()
                         // Only allowing access to the login page and the login processing endpoint if user not authenticated
-                        .requestMatchers("/login", "/register").permitAll()
+                        .requestMatchers("/login", "/register").anonymous()
                         // Allowing access to the public API
                         .requestMatchers("/api/public/**").permitAll()
                         // Allowing access to the private API if user is authenticated
@@ -91,7 +91,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3001")); // React app's domain
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3001")); 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));

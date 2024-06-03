@@ -22,6 +22,7 @@ function Login() {
         setData({ ...data, [name]: value });
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -55,7 +56,6 @@ function Login() {
             },
             withCredentials: true
         }).then((response) => {
-            console.log(response);
             if (response.status === 200) {
                 toast.success('Login successful! Redirecting to main page... ',
                     { containerId: 'login' }
@@ -63,15 +63,14 @@ function Login() {
                 axios.get(`${process.env.REACT_APP_API_BASE_URI}api/private/user/auth`, {}, {
                     withCredentials: true
                 }).then((response) => {
-                    console.log(response);
                     if (response.status === 200) {
                         setUser(response.data);
                         setTimeout(() => {
                             navigate('/');
-                        }, 2000);
+                        }, 1500);
                     }
                 }).catch((error) => {
-                    console.log(error);
+                    console.error(error);
                 });
             } else {
                 toast.error('Invalid credentials!', { containerId: 'login' });

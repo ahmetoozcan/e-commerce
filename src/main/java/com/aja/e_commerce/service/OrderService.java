@@ -47,10 +47,12 @@ public class OrderService {
                 
         for (Map.Entry<Long, Integer> entry : orderDto.getProducts().entrySet()) {
             Product product = productService.getProductById(entry.getKey());
-            OrderProduct orderProduct = new OrderProduct();
-            orderProduct.setOrder(order);
-            orderProduct.setProduct(product);
-            orderProduct.setQuantity(entry.getValue());
+            OrderProduct orderProduct = OrderProduct.builder()
+                    .order(order)
+                    .product(product)
+                    .quantity(entry.getValue())
+                    .build();
+
             orderProductService.saveOrderProduct(orderProduct);
         }
         

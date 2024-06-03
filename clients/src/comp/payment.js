@@ -35,9 +35,6 @@ const Payment = ({ cart, setCart }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        toast.success(user, {
-            containerId: 'payment-toast'
-        });
         if (!user) {
             toast.error('You need to login to make a purchase.', {
                 containerId: 'payment-toast'

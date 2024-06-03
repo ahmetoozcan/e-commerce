@@ -20,9 +20,11 @@ public class AuthController {
 
     private UserService userService;
         
-
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterUserDto registerUserDto) {
+        if(userService.existsByEmail(registerUserDto.getEmail())) {
+            return ResponseEntity.status(Response.SC_CONFLICT).body("Email already exists");
+        }
         userService.register(registerUserDto);
         return ResponseEntity.status(Response.SC_CREATED).body("User created successfully");
     }
