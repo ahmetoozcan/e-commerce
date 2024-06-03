@@ -38,7 +38,7 @@ function Register() {
             return;
         }
 
-        if (formData.email === '' || formData.password === '' || formData.confirmPassword === '' || formData.firstName === '' || formData.lastName === '') {
+        if (formData.email === '' && formData.password === '' && formData.confirmPassword === '' && formData.firstName === '' && formData.lastName === '') {
             toast.error('Please fill all the fields!', { containerId: 'register' });
             return;
         }
@@ -60,7 +60,12 @@ function Register() {
                 toast.error(`Registration failed! ${response.data}`, { containerId: 'register' });
             }
         }).catch((error) => {
-            toast.error('Something went wrong!', { containerId: 'register' });
+            if (error.response.status === 409) {
+                toast.error(`User already exists!`, { containerId: 'register' });
+                return;
+            } else {
+                toast.error('Something went wrong!', { containerId: 'register' });
+            }
         });
     }
 
