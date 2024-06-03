@@ -38,7 +38,7 @@ function Register() {
             return;
         }
 
-        if (formData.email === '' && formData.password === '' && formData.confirmPassword === '' && formData.firstName === '' && formData.lastName === '') {
+        if (formData.email === '' || formData.password === '' || formData.confirmPassword === '' || formData.name === '' || formData.surname === '') {
             toast.error('Please fill all the fields!', { containerId: 'register' });
             return;
         }
